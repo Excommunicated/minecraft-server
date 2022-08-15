@@ -2,15 +2,12 @@ FROM maven:3-openjdk-11 as mavenbuild
 ARG bctag=1.20
 WORKDIR /app
 
-RUN git clone https://github.com/Pugmatt/BedrockConnect && \
-    cd BedrockConnect && \ 
-    git checkout tags/${bctag}
-RUN mvn -f /app/BedrockConnect/serverlist-server/pom.xml install
+RUN curl -sLO https://github.com/Pugmatt/BedrockConnect/releases/download/${bctag}/BedrockConnect-1.0-SNAPSHOT.jar
 
 FROM mcr.microsoft.com/java/jre:11-zulu-ubuntu
 
 RUN mkdir -p /brc
-COPY --from=mavenbuild /app/BedrockConnect/serverlist-server/target/BedrockConnect-1.0-SNAPSHOT.jar /brc/
+COPY --from=mavenbuild /app/BedrockConnect-1.0-SNAPSHOT.jar /brc/
 
 WORKDIR /brc
 ENV custom_servers="/brc/custom_servers.json" featured_servers=true user_servers=true
